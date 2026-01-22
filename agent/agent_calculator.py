@@ -22,7 +22,7 @@ from langchain.agents import create_tool_calling_agent, AgentExecutor
 # =========================
 # 可配置参数
 # =========================
-VLLM_BASE_URL = os.getenv("VLLM_BASE_URL", "http://localhost:8000/v1")
+VLLM_BASE_URL = os.getenv("VLLM_BASE_URL", "http://localhost:8001/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "lora-adapter")  # 使用LoRA模型，或 "qwen" 使用基础模型
 TEMPERATURE = 0.7
 MAX_TOKENS = 1024
@@ -221,11 +221,6 @@ def main():
     )
     
     args = parser.parse_args()
-    
-    # 更新全局配置
-    global VLLM_BASE_URL, MODEL_NAME
-    VLLM_BASE_URL = args.base_url
-    MODEL_NAME = args.model
     
     if args.query:
         # 非交互模式：执行单个查询

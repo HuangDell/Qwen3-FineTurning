@@ -20,12 +20,15 @@
 BASE_MODEL_PATH="model/qwen"
 LORA_ADAPTER_PATH="out/qwen3-4b-lora"
 SERVED_MODEL_NAME="qwen"
-HOST="0.0.0.0"
-PORT=8000
-MAX_LORA_RANK=64
+HOST="localhost"
+PORT=8001
+MAX_LORA_RANK=16
 DTYPE="bfloat16"
 GPU_MEMORY_UTILIZATION=0.9
 NO_LORA=false
+TENSOR_PARALLEL_SIZE=2
+MAX_MODLE_LEN=8192
+MAX_NUM_SEQS=1
 
 # =========================
 # 帮助信息
@@ -59,50 +62,50 @@ EOF
 # =========================
 # 参数解析
 # =========================
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --model)
-            BASE_MODEL_PATH="$2"
-            shift 2
-            ;;
-        --lora)
-            LORA_ADAPTER_PATH="$2"
-            shift 2
-            ;;
-        --port)
-            PORT="$2"
-            shift 2
-            ;;
-        --host)
-            HOST="$2"
-            shift 2
-            ;;
-        --no-lora)
-            NO_LORA=true
-            shift
-            ;;
-        --max-lora-rank)
-            MAX_LORA_RANK="$2"
-            shift 2
-            ;;
-        --dtype)
-            DTYPE="$2"
-            shift 2
-            ;;
-        --gpu-memory-utilization)
-            GPU_MEMORY_UTILIZATION="$2"
-            shift 2
-            ;;
-        -h|--help)
-            show_help
-            ;;
-        *)
-            echo "Unknown option: $1"
-            echo "Use --help for usage information"
-            exit 1
-            ;;
-    esac
-done
+# while [[ $# -gt 0 ]]; do
+#     case $1 in
+#         --model)
+#             BASE_MODEL_PATH="$2"
+#             shift 2
+#             ;;
+#         --lora)
+#             LORA_ADAPTER_PATH="$2"
+#             shift 2
+#             ;;
+#         --port)
+#             PORT="$2"
+#             shift 2
+#             ;;
+#         --host)
+#             HOST="$2"
+#             shift 2
+#             ;;
+#         --no-lora)
+#             NO_LORA=true
+#             shift
+#             ;;
+#         --max-lora-rank)
+#             MAX_LORA_RANK="$2"
+#             shift 2
+#             ;;
+#         --dtype)
+#             DTYPE="$2"
+#             shift 2
+#             ;;
+#         --gpu-memory-utilization)
+#             GPU_MEMORY_UTILIZATION="$2"
+#             shift 2
+#             ;;
+#         -h|--help)
+#             show_help
+#             ;;
+#         *)
+#             echo "Unknown option: $1"
+#             echo "Use --help for usage information"
+#             exit 1
+#             ;;
+#     esac
+# done
 
 # =========================
 # 构建vLLM启动参数
@@ -115,6 +118,11 @@ SERVER_ARGS=(
     --trust-remote-code
     --dtype "$DTYPE"
     --gpu-memory-utilization "$GPU_MEMORY_UTILIZATION"
+    --tensor-parallel-size "$TENSOR_PARALLEL_SIZE"
+    --max-model-len "$MAX_MODLE_LEN"
+    --max-num-seqs "$MAX_NUM_SEQS"
+    --enable-auto-tool-choice
+    --tool-call-parser "hermes"
 )
 
 # 如果启用LoRA
