@@ -30,3 +30,7 @@ numpy>=1.26.0
 pydantic>=2.7.0
 packaging>=24.1
 protobuf>=4.25.0
+
+# ===== LangChain / Agent =====
+langchain>=0.3.0
+langchain-openai>=0.2.0
