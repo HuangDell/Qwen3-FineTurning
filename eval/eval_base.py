@@ -4,13 +4,11 @@ from typing import List, Dict
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
 
 # =========================
 # Editable parameters
 # =========================
 BASE_MODEL_PATH = "model/qwen"  # Base model path
-LORA_ADAPTER_PATH = "out/qwen3-4b-lora-medical"  # Path to trained LoRA adapter
 
 # Generation parameters
 MAX_NEW_TOKENS = 512
@@ -21,32 +19,27 @@ DO_SAMPLE = True
 
 # Device
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-# torch.manual_seed(42)
 
 
 def load_model_and_tokenizer():
-    """Load base model with LoRA adapter and tokenizer."""
+    """Load base model and tokenizer."""
     print(f"Loading base model from: {BASE_MODEL_PATH}")
     
     # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(
-        LORA_ADAPTER_PATH,  # Load from adapter path (includes saved tokenizer)
+        BASE_MODEL_PATH,
         use_fast=True,
         trust_remote_code=True
     )
     
     # Load base model
-    base_model = AutoModelForCausalLM.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(
         BASE_MODEL_PATH,
         torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
         device_map="auto",
         trust_remote_code=True
     )
     
-    print(f"Loading LoRA adapter from: {LORA_ADAPTER_PATH}")
-    # Load LoRA adapter
-    model = PeftModel.from_pretrained(base_model, LORA_ADAPTER_PATH)
-    model = model.merge_and_unload()  # Merge LoRA weights for faster inference
     model.eval()
     
     print(f"Model loaded successfully on {DEVICE}")
@@ -55,13 +48,6 @@ def load_model_and_tokenizer():
 
 def chat(model, tokenizer, messages: List[Dict[str, str]]) -> str:
     """Generate response for the conversation."""
-
-    # print("eos_token_id:", tokenizer.eos_token_id)
-    # print("pad_token_id:", tokenizer.pad_token_id)
-    # print("bos_token_id:", tokenizer.bos_token_id)
-    # print("eos_token_id:", model.generation_config.eos_token_id)
-    # print("pad_token_id:", model.generation_config.pad_token_id)
-    # print("bos_token_id:", model.generation_config.bos_token_id)
     
     # Apply chat template
     prompt = tokenizer.apply_chat_template(
@@ -73,7 +59,6 @@ def chat(model, tokenizer, messages: List[Dict[str, str]]) -> str:
     # Tokenize
     inputs = tokenizer(prompt, return_tensors="pt", add_special_tokens=False)
     inputs = {k: v.to(model.device) for k, v in inputs.items()}
-
     
     # Generate
     with torch.no_grad():
@@ -100,7 +85,7 @@ def chat(model, tokenizer, messages: List[Dict[str, str]]) -> str:
 def main():
     """Main interactive chat loop."""
     print("="*60)
-    print("LoRA Model Interactive Chat")
+    print("Base Qwen3 Model Interactive Chat")
     print("="*60)
     print("Commands:")
     print("  - Type your message to chat")
