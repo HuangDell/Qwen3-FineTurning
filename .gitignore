@@ -36,3 +36,5 @@ wandb/
 
 *.tmp
 *.swp
+
+set_env.sh
