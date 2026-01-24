@@ -64,6 +64,9 @@ def load_model_and_tokenizer():
             use_fast=True,
             trust_remote_code=True
         )
+        chat_template_path = "./template/qwen_chat_template.jinja"
+        with open(chat_template_path, "r", encoding="utf-8") as f:
+            tokenizer.chat_template = f.read()
         
         # Load base model
         base_model = AutoModelForCausalLM.from_pretrained(

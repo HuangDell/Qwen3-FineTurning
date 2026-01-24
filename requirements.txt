@@ -40,3 +40,6 @@ requests>=2.31.0
 # ===== Vector DB =====
 pysqlite3-binary
 chromadb
+
+# ===== Logging / tracking (optional but helpful) =====
+tensorboard
