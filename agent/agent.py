@@ -28,6 +28,7 @@ from langchain.agents import create_tool_calling_agent, AgentExecutor
 VLLM_BASE_URL = os.getenv("VLLM_BASE_URL", "http://localhost:8001/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "lora-adapter")  # 使用LoRA模型，或 "qwen" 使用基础模型
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
+TEMPERATURE = 0.7
 MAX_TOKENS = 1024
 
 

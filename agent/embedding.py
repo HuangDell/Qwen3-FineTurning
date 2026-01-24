@@ -1,14 +1,17 @@
 import json
 from tqdm import tqdm
+import sys
+import pysqlite3
+sys.modules["sqlite3"] = pysqlite3
 import chromadb
 from sentence_transformers import SentenceTransformer
 
-CHUNKS_PATH = "chunks.json"
-MODEL_DIR = "/path/to/your/qwen3-embedding-4B"  # 本地目录也可以
+CHUNKS_PATH = "data/chunks.json"
+MODEL_DIR = "model/qwen-embedding"  # 本地目录也可以
 PERSIST_DIR = "./chroma_db"
 COLLECTION = "kb_chunks"
 
-BATCH_SIZE = 32  # 4B 可能需要 16/8，按显存调
+BATCH_SIZE = 16  # 4B 可能需要 16/8，按显存调
 
 def clean_meta(m: dict):
     out = {}
@@ -21,7 +24,7 @@ def clean_meta(m: dict):
             out[k] = str(v)
     return out
 
-# 不开 flash_attention_2 的版本（最稳）
+# 不开 flash_attention_2 的版本
 model = SentenceTransformer(MODEL_DIR)
 
 # 如果你已装好 flash-attn，并且环境支持，可改用：

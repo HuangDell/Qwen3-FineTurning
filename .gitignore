@@ -38,3 +38,5 @@ wandb/
 *.swp
 
 set_env.sh
+
+chroma_db/
